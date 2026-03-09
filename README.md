@@ -2,6 +2,35 @@ Nama: Jessica Tandra
 NPM: 2406355445  
 Kelas: Adpro B  
 
+# Reflection 4: Refactoring and TDD (1)
+> Reflect based on Percival (2017) proposed self-reflective questions (in “Principles and Best Practice of Testing” submodule, chapter “Evaluating Your Testing Objectives”), whether this TDD flow is useful enough for you or not. If not, explain things that you need to do next time you make more tests.
+
+Following the TDD workflow in this tutorial was quite helpful for me. Based on the self-reflective questions proposed by Percival (2017), I feel that the tests I wrote were able to support the main objectives of testing.
+
+From the **Correctness** perspective, the tests help check whether the main functionalities, such as creating and updating orders, behave as expected. I also tried to include some edge cases, for example when the status input is invalid or when the product list is empty. However, I realize that most of my tests are still focused on unit-level behavior. Next time, I think I should also add more functional tests so I can better ensure that the application works properly from the user's point of view.
+
+In terms of **Maintainability**, having tests made it easier for me to refactor the code with more confidence. For instance, when I refactored the `Order` model to use the `OrderStatus` enum instead of primitive strings, the existing tests helped confirm that the behavior of the system was still correct. Writing tests first also encouraged me to think about how the classes and methods should be structured before implementing them.
+
+Regarding **productive workflow**, the feedback cycle felt relatively fast because the unit tests run very quickly. I was able to run specific tests, such as `OrderTest` or `OrderServiceImplTest`, whenever I wanted to check a particular component. Since the dependencies were stubbed using Mockito, the tests stayed lightweight and did not require external systems to run.
+
+For future improvements, I think I should start incorporating integration tests to verify whether different components work correctly when combined. In addition, I would like to explore ways to write functional tests that are still efficient so that the feedback cycle remains fast.
+
+> You have created unit tests in Tutorial. Now reflect whether your tests have successfully followed F.I.R.S.T. principle or not. If not, explain things that you need to do the next time you create more tests.
+
+Based on the F.I.R.S.T. principles, most of the unit tests I created generally follow these guidelines.
+
+1. **Fast:** Since they do not depend on slow external systems. By using stubs with Mockito in `OrderServiceImplTest`, the tests can run quickly and repeatedly without waiting for external resources.
+2. **Isolated/Independent:** Each test initializes its own data using the `@BeforeEach` setup method, which helps avoid interference between tests. The repository layer is also replaced with test doubles so that the service layer can be tested independently.
+3. **Repeatable:** Because they do not rely on changing external conditions. Since dependencies like `OrderRepository` are stubbed, the tests should produce consistent results across different runs and environments.
+4. **Self-Validating:** I used assertions such as `assertEquals`, `assertThrows`, and `assertNull` so that the test results are automatically evaluated without requiring manual inspection. I avoided manual `print` functions and tried to keep the scope of the assertions as small and accurate as possible.
+5. **Thorough/Timely:** The tests were timely and thorough, because they were written before implementing the production code as part of the TDD workflow. I also tried to include both happy path and unhappy path scenarios, such as successful ID lookups and cases where invalid inputs are provided.
+
+However, I realize that being thorough does not only mean achieving high coverage. In the future, I need to be more careful in designing test cases so that they truly validate important behaviors of the system, instead of only executing lines of code to increase coverage.
+
+
+<details>
+    <summary><b>Reflection 3: Maintainability and OO Principles</b></summary>
+
 # Reflection 3: Maintainability and OO Principles
 > Explain what principles you apply to your project!
 
@@ -32,6 +61,8 @@ Applying SOLID principles has significantly improved the project's maintainabili
 > Explain the disadvantages of not applying SOLID principles to your project with examples.
 
 Not applying SOLID principles to our project can lead to a codebase that is rigid, fragile, and difficult to maintain. Without SRP, classes like CarController would become bloated with multiple responsibilities, making the code complex and hard to debug. Ignoring OCP and DIP leads to tight coupling, where a simple change (like switching storage types) forces us to rewrite the core controller logic, increasing the risk of introducing new bugs. Furthermore, disregarding LSP and ISP causes "code pollution," where classes inherit irrelevant methods (e.g., CarController inheriting Product routes) or depend on unused interfaces, leading to unexpected behavior and a system that is confusing to extend.
+
+</details>
 
 <details>
     <summary><b>Reflection 2: CI/CD and DevOps</b></summary>
