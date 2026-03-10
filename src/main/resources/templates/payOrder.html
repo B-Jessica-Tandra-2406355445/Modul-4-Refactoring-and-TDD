@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pay Order</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<div class="container mt-5">
+    <h3>Pay Order</h3>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Order ID:</strong> <span th:text="${order.id}"></span></p>
+            <p><strong>Author:</strong> <span th:text="${order.author}"></span></p>
+            <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
+        </div>
+    </div>
+
+    <form th:action="@{/order/pay/{id}(id=${order.id})}" method="post">
+        <div class="form-group">
+            <label for="methodSelect">Payment Method</label>
+            <select name="method" id="methodSelect" class="form-control col-4" required>
+                <option value="">-- Select Method --</option>
+                <option value="VOUCHER_CODE">Voucher Code</option>
+                <option value="CASH_ON_DELIVERY">Cash on Delivery</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Pay Now</button>
+        <a th:href="@{/order/history}" class="btn btn-outline-secondary mt-2 ml-2">Back</a>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>
