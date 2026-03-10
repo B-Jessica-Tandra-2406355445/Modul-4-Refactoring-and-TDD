@@ -53,4 +53,11 @@ public class Payment {
 
         return address != null && !address.isEmpty() && deliveryFee != null && !deliveryFee.isEmpty();
     }
+
+    public void setStatus(String status) {
+        if (!status.equals("SUCCESS") && !status.equals("REJECTED")) {
+            throw new IllegalArgumentException("Invalid payment status: " + status);
+        }
+        this.status = status;
+    }
 }

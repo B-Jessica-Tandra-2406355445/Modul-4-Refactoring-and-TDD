@@ -50,6 +50,7 @@ class PaymentServiceImplTest {
         payments = new ArrayList<>();
         Map<String, String> paymentData1 = new HashMap<>();
         paymentData1.put("voucherCode", "ESHOP1234ABC5678");
+        paymentData1.put("orderId", order.getId());
         Payment payment1 = new Payment("1", "VOUCHER_CODE", paymentData1);
         payments.add(payment1);
     }
@@ -58,19 +59,18 @@ class PaymentServiceImplTest {
     void testAddPayment() {
         Payment payment = payments.get(0);
         doReturn(payment).when(paymentRepository).save(any(Payment.class));
-        doReturn(order).when(orderService).updateStatus(order.getId(), OrderStatus.SUCCESS.getValue());
 
         Payment result = paymentService.addPayment(order, payment.getMethod(), payment.getPaymentData());
 
         verify(paymentRepository, times(1)).save(any(Payment.class));
-        verify(orderService, times(1)).updateStatus(order.getId(), OrderStatus.SUCCESS.getValue());
+        verify(orderService, times(0)).updateStatus(anyString(), anyString());
         assertEquals(payment.getId(), result.getId());
+        assertEquals(order.getId(), result.getPaymentData().get("orderId"));
     }
 
     @Test
     void testSetStatusToSuccess() {
         Payment payment = payments.get(0);
-        doReturn(payment).when(paymentRepository).findById(payment.getId());
         doReturn(payment).when(paymentRepository).save(any(Payment.class));
         doReturn(order).when(orderService).updateStatus(order.getId(), OrderStatus.SUCCESS.getValue());
 
@@ -84,15 +84,25 @@ class PaymentServiceImplTest {
     @Test
     void testSetStatusToRejected() {
         Payment payment = payments.get(0);
-        doReturn(payment).when(paymentRepository).findById(payment.getId());
+
         doReturn(payment).when(paymentRepository).save(any(Payment.class));
-        doReturn(order).when(orderService).updateStatus(order.getId(), OrderStatus.FAILED.getValue());
+        doReturn(order).when(orderService)
+                .updateStatus(order.getId(), OrderStatus.FAILED.getValue());
 
         Payment result = paymentService.setStatus(payment, PaymentStatus.REJECTED.getValue());
 
         assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
         verify(paymentRepository, times(1)).save(any(Payment.class));
-        verify(orderService, times(1)).updateStatus(order.getId(), OrderStatus.FAILED.getValue());
+        verify(orderService, times(1))
+                .updateStatus(order.getId(), OrderStatus.FAILED.getValue());
+    }
+
+    @Test
+    void testSetStatusInvalid() {
+        Payment payment = payments.get(0);
+        assertThrows(IllegalArgumentException.class, () -> {
+            paymentService.setStatus(payment, "INVALID_STATUS");
+        });
     }
 
     @Test
