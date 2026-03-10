@@ -1,12 +1,13 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Order;
+import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -25,21 +26,29 @@ class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private OrderService orderService;
 
     private Order order;
 
     @BeforeEach
     void setUp() {
-        order = new Order("12345", new ArrayList<>(), 123456789L, "Jessica");
+        Product product = new Product();
+        product.setId("product-001");
+        product.setName("Test Product");
+        product.setQuantity(1);
+
+        List<Product> products = new ArrayList<>();
+        products.add(product);
+
+        order = new Order("12345", products, 123456789L, "Jessica");
     }
 
     @Test
     void testCreateOrderGet() throws Exception {
         mockMvc.perform(get("/order/create"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("order/createOrder"));
+                .andExpect(view().name("createOrder"));
     }
 
     @Test
@@ -56,7 +65,7 @@ class OrderControllerTest {
     void testHistoryOrderGet() throws Exception {
         mockMvc.perform(get("/order/history"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("order/orderHistory"));
+                .andExpect(view().name("orderHistory"));
     }
 
     @Test
@@ -69,6 +78,29 @@ class OrderControllerTest {
                         .param("author", "Jessica"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("orders"))
-                .andExpect(view().name("order/orderList"));
+                .andExpect(model().attributeExists("author"))
+                .andExpect(view().name("orderList"));
+    }
+
+    @Test
+    void testPayOrderPageGet() throws Exception {
+        when(orderService.findById(order.getId())).thenReturn(order);
+
+        mockMvc.perform(get("/order/pay/" + order.getId()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("order"))
+                .andExpect(view().name("payOrder"));
+    }
+
+    @Test
+    void testPayOrderResultPost() throws Exception {
+        when(orderService.findById(order.getId())).thenReturn(order);
+
+        mockMvc.perform(post("/order/pay/" + order.getId())
+                        .param("method", "VOUCHER_CODE"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("order"))
+                .andExpect(model().attributeExists("method"))
+                .andExpect(view().name("payResult"));
     }
 }
