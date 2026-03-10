@@ -16,32 +16,40 @@ public class Payment {
         this.method = method;
         this.paymentData = paymentData;
 
-        boolean isValid = false;
-
-        if (method.equals("VOUCHER_CODE")) {
-            String voucherCode = paymentData.get("voucherCode");
-            if (voucherCode != null && voucherCode.length() == 16 && voucherCode.startsWith("ESHOP")) {
-                int numCount = 0;
-                for (char c : voucherCode.toCharArray()) {
-                    if (Character.isDigit(c)) numCount++;
-                }
-                if (numCount == 8) {
-                    isValid = true;
-                }
-            }
-        } else if (method.equals("CASH_ON_DELIVERY")) {
-            String address = paymentData.get("address");
-            String deliveryFee = paymentData.get("deliveryFee");
-            if (address != null && !address.isEmpty() && deliveryFee != null && !deliveryFee.isEmpty()) {
-                isValid = true;
-            }
-        }
-
-        if (isValid) {
+        if (isValidPayment()) {
             this.status = "SUCCESS";
         } else {
             this.status = "REJECTED";
         }
     }
 
+    private boolean isValidPayment() {
+        if ("VOUCHER_CODE".equals(this.method)) {
+            return validateVoucherCode();
+        } else if ("CASH_ON_DELIVERY".equals(this.method)) {
+            return validateCashOnDelivery();
+        }
+        return false;
+    }
+    private boolean validateVoucherCode() {
+        String voucherCode = this.paymentData.get("voucherCode");
+        if (voucherCode == null || voucherCode.length() != 16 || !voucherCode.startsWith("ESHOP")) {
+            return false;
+        }
+
+        int numCount = 0;
+        for (char c : voucherCode.toCharArray()) {
+            if (Character.isDigit(c)) {
+                numCount++;
+            }
+        }
+        return numCount == 8;
+    }
+
+    private boolean validateCashOnDelivery() {
+        String address = this.paymentData.get("address");
+        String deliveryFee = this.paymentData.get("deliveryFee");
+
+        return address != null && !address.isEmpty() && deliveryFee != null && !deliveryFee.isEmpty();
+    }
 }
