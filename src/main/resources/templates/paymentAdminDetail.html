@@ -8,7 +8,7 @@
 <body>
 <div class="container mt-5">
     <h3>Admin - Payment Detail</h3>
-    <div class="card mb-4">
+    <div class="card mb-4" th:if="${payment != null}">
         <div class="card-body">
             <p><strong>Payment ID:</strong> <span th:text="${payment.id}"></span></p>
             <p><strong>Method:</strong> <span th:text="${payment.method}"></span></p>
@@ -19,7 +19,7 @@
             </p>
         </div>
     </div>
-    <form th:action="@{/payment/admin/set-status/{id}(id=${payment.id})}" method="post">
+    <form th:if="${payment != null}" th:action="@{/payment/admin/set-status/{id}(id=${payment.id})}" method="post">
         <div class="form-group">
             <label for="statusSelect">Set Status</label>
             <select name="status" id="statusSelect" class="form-control col-4" required>
